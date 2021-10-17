@@ -1,0 +1,38 @@
+{
+    "BadRequestError": {
+        "description": "It means that the request was corrupted.",
+        "grpc": 3,
+        "http": 400,
+        "permanent": true
+    },
+    "UnauthorizedError": {
+        "description": "It means that there is no access because of authorization restrictions.",
+        "grpc": 16,
+        "http": 401,
+        "permanent": true
+    },
+    "ForbiddenError": {
+        "description": "It means that there is no access to a restricted resource.",
+        "grpc": 7,
+        "http": 403,
+        "permanent": true
+    },
+    "NotFoundError": {
+        "description": "It means that accessed resource doesn't exist.",
+        "grpc": 5,
+        "http": 404,
+        "permanent": true
+    },
+    "InternalServerError": {
+        "description": "An unknown unhandled internal server error.",
+        "grpc": 2,
+        "http": 500,
+        "permanent": true
+    },
+    "ServiceUnavailableError": {
+        "description": "It indicates that the server is not ready to handle the request.",
+        "grpc": 14,
+        "http": 503,
+        "permanent": false
+    }
+}

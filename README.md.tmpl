@@ -1,0 +1,61 @@
+# semerr
+
+Package `semerr` helps to work with errors in Golang.
+
+## Multierror
+
+If you need to handle more than one err, you can use `MultiError`:
+
+```go
+defer func() {
+    // It will skip all nil errors.
+    err = semerr.NewMultiError(err, f.Close())
+}()
+```
+
+## Const error
+
+An error that can be defined as `const`.
+
+```go
+var errMutable error = errors.New("mutable error") // Do not like this?
+const errImmutable semerr.Error = "immutable error" // So use this.
+```
+
+## TemporaryError checking
+
+The function `semerr.IsTemporaryError` checks that error has Temporary
+method and it returns true.
+
+```go
+semerr.IsTemporaryError(context.DeadlineExceeded) // true
+semerr.IsTemporaryError(context.Canceled) // false
+```
+
+## Errors with meaning
+
+```go
+errOriginal := errors.New("some error")
+errWrapped := semerr.NewBadRequestError(errOriginal) // The text will be the same.
+
+fmt.Println(errWrapped) // "some error"
+fmt.Println(httperr.Code(errWrapped)) // http.StatusBadRequest
+fmt.Println(grpcerr.Code(errWrapped)) // codes.InvalidArgument
+fmt.Println(errors.Is(err, errOriginal)) // true
+fmt.Println(semerr.NewBadRequestError(nil)) // nil
+```
+
+Also see:
+```go
+err := errors.New("some error")
+{{- range $errorName, $errorDef := . }}
+err = semerr.New{{ $errorName }}(err)
+{{- end }}
+```
+
+## Contributing
+
+Pull requests are welcomed. If you want to add a new meaning error. Edit
+the file
+[internal/cmd/generator/errors.json](internal/cmd/generator/errors.json)
+and generate a new code, for this run `make`.
