@@ -6,6 +6,7 @@ import (
 
 	"github.com/hedhyw/semerr/pkg/v1/grpcerr"
 	"github.com/hedhyw/semerr/pkg/v1/semerr"
+
 	"google.golang.org/grpc/codes"
 )
 
