@@ -25,6 +25,11 @@ func TestWrappedErrors(t *testing.T) {
 			Permanent: true,
 		},
 		{
+			Name:      "ConflictError",
+			Create:    semerr.NewConflictError,
+			Permanent: true,
+		},
+		{
 			Name:      "ForbiddenError",
 			Create:    semerr.NewForbiddenError,
 			Permanent: true,

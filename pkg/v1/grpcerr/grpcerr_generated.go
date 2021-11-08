@@ -18,6 +18,8 @@ func Code(err error) codes.Code {
 		return codes.OK
 	case semerr.BadRequestError:
 		return 3
+	case semerr.ConflictError:
+		return 6
 	case semerr.ForbiddenError:
 		return 7
 	case semerr.InternalServerError:

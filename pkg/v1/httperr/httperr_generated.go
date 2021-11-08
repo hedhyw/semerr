@@ -16,6 +16,8 @@ func Code(err error) int {
 		return http.StatusOK
 	case semerr.BadRequestError:
 		return 400
+	case semerr.ConflictError:
+		return 409
 	case semerr.ForbiddenError:
 		return 403
 	case semerr.InternalServerError:

@@ -47,6 +47,7 @@ Also see:
 ```go
 err := errors.New("some error")
 err = semerr.NewBadRequestError(err)
+err = semerr.NewConflictError(err)
 err = semerr.NewForbiddenError(err)
 err = semerr.NewInternalServerError(err)
 err = semerr.NewNotFoundError(err)

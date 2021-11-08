@@ -23,6 +23,12 @@
         "http": 404,
         "permanent": true
     },
+    "ConflictError": {
+        "description": "Attempt to create a resource that already exists.",
+        "grpc": 6,
+        "http": 409,
+        "permanent": true
+    },
     "InternalServerError": {
         "description": "An unknown unhandled internal server error.",
         "grpc": 2,

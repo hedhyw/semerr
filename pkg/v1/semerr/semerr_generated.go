@@ -19,6 +19,23 @@ func NewBadRequestError(err error) error {
 	return BadRequestError{newPermanentWrappedError(err)}
 }
 
+// ConflictError is a permanent error.
+// Attempt to create a resource that already exists.
+type ConflictError struct {
+	permanentWrappedError
+}
+
+// NewConflictError wraps err and creates ConflictError.
+// Attempt to create a resource that already exists.
+// If err is nil it returns nil.
+func NewConflictError(err error) error {
+	if err == nil {
+		return nil
+	}
+
+	return ConflictError{newPermanentWrappedError(err)}
+}
+
 // ForbiddenError is a permanent error.
 // It means that there is no access to a restricted resource.
 type ForbiddenError struct {

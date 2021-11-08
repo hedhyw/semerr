@@ -33,6 +33,10 @@ func TestCode(t *testing.T) {
 			Code: 400,
 		},
 		{
+			Err:  semerr.NewConflictError(err),
+			Code: 409,
+		},
+		{
 			Err:  semerr.NewForbiddenError(err),
 			Code: 403,
 		},
