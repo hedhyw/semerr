@@ -87,6 +87,23 @@ func NewNotFoundError(err error) error {
 	return NotFoundError{newPermanentWrappedError(err)}
 }
 
+// RequestEntityTooLargeError is a permanent error.
+// It means that the request has too large enities.
+type RequestEntityTooLargeError struct {
+	permanentWrappedError
+}
+
+// NewRequestEntityTooLargeError wraps err and creates RequestEntityTooLargeError.
+// It means that the request has too large enities.
+// If err is nil it returns nil.
+func NewRequestEntityTooLargeError(err error) error {
+	if err == nil {
+		return nil
+	}
+
+	return RequestEntityTooLargeError{newPermanentWrappedError(err)}
+}
+
 // ServiceUnavailableError is a tememporary error.
 // It indicates that the server is not ready to handle the request.
 type ServiceUnavailableError struct {

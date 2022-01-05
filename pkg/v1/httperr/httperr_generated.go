@@ -24,6 +24,8 @@ func Code(err error) int {
 		return 500
 	case semerr.NotFoundError:
 		return 404
+	case semerr.RequestEntityTooLargeError:
+		return 413
 	case semerr.ServiceUnavailableError:
 		return 503
 	case semerr.UnauthorizedError:

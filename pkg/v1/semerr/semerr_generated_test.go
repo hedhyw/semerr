@@ -45,6 +45,11 @@ func TestWrappedErrors(t *testing.T) {
 			Permanent: true,
 		},
 		{
+			Name:      "RequestEntityTooLargeError",
+			Create:    semerr.NewRequestEntityTooLargeError,
+			Permanent: true,
+		},
+		{
 			Name:      "ServiceUnavailableError",
 			Create:    semerr.NewServiceUnavailableError,
 			Permanent: false,

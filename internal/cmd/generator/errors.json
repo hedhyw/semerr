@@ -5,6 +5,12 @@
         "http": 400,
         "permanent": true
     },
+    "RequestEntityTooLargeError": {
+        "description": "It means that the request has too large enities.",
+        "grpc": 11,
+        "http": 413,
+        "permanent": true
+    },
     "UnauthorizedError": {
         "description": "It means that there is no access because of authorization restrictions.",
         "grpc": 16,

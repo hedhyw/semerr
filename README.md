@@ -51,6 +51,7 @@ err = semerr.NewConflictError(err)
 err = semerr.NewForbiddenError(err)
 err = semerr.NewInternalServerError(err)
 err = semerr.NewNotFoundError(err)
+err = semerr.NewRequestEntityTooLargeError(err)
 err = semerr.NewServiceUnavailableError(err)
 err = semerr.NewUnauthorizedError(err)
 ```

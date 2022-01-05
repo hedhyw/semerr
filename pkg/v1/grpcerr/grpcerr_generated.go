@@ -26,6 +26,8 @@ func Code(err error) codes.Code {
 		return 2
 	case semerr.NotFoundError:
 		return 5
+	case semerr.RequestEntityTooLargeError:
+		return 11
 	case semerr.ServiceUnavailableError:
 		return 14
 	case semerr.UnauthorizedError:
