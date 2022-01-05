@@ -56,7 +56,7 @@ func TestCode(t *testing.T) {
 		},
 		{
 			Err:  semerr.NewRequestEntityTooLargeError(err),
-			Code: 14,
+			Code: 11,
 		},
 		{
 			Err:  semerr.NewServiceUnavailableError(err),

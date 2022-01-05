@@ -7,7 +7,7 @@
     },
     "RequestEntityTooLargeError": {
         "description": "It means that the request has too large enities.",
-        "grpc": 14,
+        "grpc": 11,
         "http": 413,
         "permanent": true
     },
