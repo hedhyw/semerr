@@ -16,8 +16,8 @@ func Code(err error) codes.Code {
 	switch err.(type) {
 	case nil:
 		return codes.OK
-	{{- range $errorName, $errorDef := . }}
-	case semerr.{{ $errorName }}:
+	{{- range $errorDef := . }}
+	case semerr.{{ $errorDef.Name }}:
 		return {{ $errorDef.GRPCStatus }}
 	{{- end }}
 	}

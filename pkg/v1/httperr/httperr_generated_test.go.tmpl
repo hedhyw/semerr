@@ -28,9 +28,9 @@ func TestCode(t *testing.T) {
 			Err:  err,
 			Code: http.StatusInternalServerError,
 		},
-		{{- range $errorName, $errorDef := . }}
+		{{- range $errorDef := . }}
 		{
-			Err:  semerr.New{{ $errorName }}(err),
+			Err:  semerr.New{{ $errorDef.Name }}(err),
 			Code: {{ $errorDef.HTTPStatus }},
 		},
 		{{- end }}

@@ -4,6 +4,7 @@ package semerr_test
 
 import (
 	"errors"
+	"strings"
 	"testing"
 
 	"github.com/hedhyw/semerr/pkg/v1/semerr"
@@ -17,47 +18,72 @@ func TestWrappedErrors(t *testing.T) {
 	testCases := []struct {
 		Name      string
 		Create    func(err error) error
-		Permanent bool
+		Temporary bool
 	}{
 		{
-			Name:      "BadRequestError",
-			Create:    semerr.NewBadRequestError,
-			Permanent: true,
-		},
-		{
-			Name:      "ConflictError",
-			Create:    semerr.NewConflictError,
-			Permanent: true,
-		},
-		{
-			Name:      "ForbiddenError",
-			Create:    semerr.NewForbiddenError,
-			Permanent: true,
+			Name:      "StatusRequestTimeoutError",
+			Create:    semerr.NewStatusRequestTimeoutError,
+			Temporary: true,
 		},
 		{
 			Name:      "InternalServerError",
 			Create:    semerr.NewInternalServerError,
-			Permanent: true,
+			Temporary: false,
+		},
+		{
+			Name:      "BadRequestError",
+			Create:    semerr.NewBadRequestError,
+			Temporary: false,
+		},
+		{
+			Name:      "UnsupportedMediaTypeError",
+			Create:    semerr.NewUnsupportedMediaTypeError,
+			Temporary: false,
+		},
+		{
+			Name:      "StatusGatewayTimeoutError",
+			Create:    semerr.NewStatusGatewayTimeoutError,
+			Temporary: true,
 		},
 		{
 			Name:      "NotFoundError",
 			Create:    semerr.NewNotFoundError,
-			Permanent: true,
+			Temporary: false,
+		},
+		{
+			Name:      "ConflictError",
+			Create:    semerr.NewConflictError,
+			Temporary: false,
+		},
+		{
+			Name:      "ForbiddenError",
+			Create:    semerr.NewForbiddenError,
+			Temporary: false,
+		},
+		{
+			Name:      "TooManyRequestsError",
+			Create:    semerr.NewTooManyRequestsError,
+			Temporary: false,
 		},
 		{
 			Name:      "RequestEntityTooLargeError",
 			Create:    semerr.NewRequestEntityTooLargeError,
-			Permanent: true,
+			Temporary: false,
+		},
+		{
+			Name:      "UnimplementedError",
+			Create:    semerr.NewUnimplementedError,
+			Temporary: false,
 		},
 		{
 			Name:      "ServiceUnavailableError",
 			Create:    semerr.NewServiceUnavailableError,
-			Permanent: false,
+			Temporary: true,
 		},
 		{
 			Name:      "UnauthorizedError",
 			Create:    semerr.NewUnauthorizedError,
-			Permanent: true,
+			Temporary: false,
 		},
 	}
 
@@ -69,13 +95,15 @@ func TestWrappedErrors(t *testing.T) {
 
 			errWrapped := tc.Create(err)
 			switch {
+			case !strings.HasSuffix(tc.Name, "Error"):
+				t.Fatal(tc.Name)
 			case tc.Create(nil) != nil:
 				t.Fatal()
 			case errWrapped.Error() != err.Error():
 				t.Fatal("exp", err.Error(), "got", errWrapped.Error())
 			case !errors.Is(errWrapped, err):
 				t.Fatal()
-			case semerr.IsTemporaryError(errWrapped) == tc.Permanent:
+			case semerr.IsTemporaryError(errWrapped) != tc.Temporary:
 				t.Fatal()
 			}
 		})

@@ -35,8 +35,28 @@ func TestCode(t *testing.T) {
 			Code: codes.AlreadyExists,
 		},
 		{
+			Err:  semerr.NewStatusRequestTimeoutError(err),
+			Code: 1,
+		},
+		{
+			Err:  semerr.NewInternalServerError(err),
+			Code: 2,
+		},
+		{
 			Err:  semerr.NewBadRequestError(err),
 			Code: 3,
+		},
+		{
+			Err:  semerr.NewUnsupportedMediaTypeError(err),
+			Code: 3,
+		},
+		{
+			Err:  semerr.NewStatusGatewayTimeoutError(err),
+			Code: 4,
+		},
+		{
+			Err:  semerr.NewNotFoundError(err),
+			Code: 5,
 		},
 		{
 			Err:  semerr.NewConflictError(err),
@@ -47,16 +67,16 @@ func TestCode(t *testing.T) {
 			Code: 7,
 		},
 		{
-			Err:  semerr.NewInternalServerError(err),
-			Code: 2,
-		},
-		{
-			Err:  semerr.NewNotFoundError(err),
-			Code: 5,
+			Err:  semerr.NewTooManyRequestsError(err),
+			Code: 8,
 		},
 		{
 			Err:  semerr.NewRequestEntityTooLargeError(err),
 			Code: 11,
+		},
+		{
+			Err:  semerr.NewUnimplementedError(err),
+			Code: 12,
 		},
 		{
 			Err:  semerr.NewServiceUnavailableError(err),

@@ -46,8 +46,10 @@ fmt.Println(semerr.NewBadRequestError(nil)) // nil
 Also see:
 ```go
 err := errors.New("some error")
-{{- range $errorName, $errorDef := . }}
-err = semerr.New{{ $errorName }}(err)
+{{- range $errorDef := . }}
+
+{{ multlineComment $errorDef.Description }}
+err = semerr.New{{ $errorDef.Name }}(err)
 {{- end }}
 ```
 

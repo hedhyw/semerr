@@ -34,9 +34,9 @@ func TestCode(t *testing.T) {
 			Err:  status.Error(codes.AlreadyExists, "already found"),
 			Code: codes.AlreadyExists,
 		},
-		{{- range $errorName, $errorDef := . }}
+		{{- range $errorDef := . }}
 		{
-			Err:  semerr.New{{ $errorName }}(err),
+			Err:  semerr.New{{ $errorDef.Name }}(err),
 			Code: {{ $errorDef.GRPCStatus }},
 		},
 		{{- end }}
