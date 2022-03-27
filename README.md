@@ -123,5 +123,5 @@ err = semerr.NewUnauthorizedError(err)
 
 Pull requests are welcomed. If you want to add a new meaning error then
 edit the file
-[internal/cmd/generator/errors.json](internal/cmd/generator/errors.json)
+[internal/cmd/generator/errors.yaml](internal/cmd/generator/errors.yaml)
 and generate a new code, for this run `make`.
