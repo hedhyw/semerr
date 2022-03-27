@@ -94,9 +94,19 @@ func TestCode(t *testing.T) {
 		t.Run(fmt.Sprint(tc.Err), func(t *testing.T) {
 			t.Parallel()
 
-			gotCode := grpcerr.Code(tc.Err)
+			err := tc.Err
+			gotCode := grpcerr.Code(err)
 			if tc.Code != gotCode {
 				t.Fatal("exp", tc.Code, "got", gotCode)
+			}
+
+			if err != nil {
+				err = fmt.Errorf("wrapped: 1: %w", err)
+				err = fmt.Errorf("wrapped: 2: %w", err)
+				gotCode = grpcerr.Code(err)
+				if tc.Code != gotCode {
+					t.Fatal("exp", tc.Code, "got", gotCode)
+				}
 			}
 		})
 	}

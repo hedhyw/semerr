@@ -3,9 +3,10 @@
 # semerr
 
 ![Version](https://img.shields.io/github/v/tag/hedhyw/semerr)
+![Build Status](https://github.com/hedhyw/semerr/actions/workflows/check.yml/badge.svg)
 [![Go Report Card](https://goreportcard.com/badge/github.com/hedhyw/semerr)](https://goreportcard.com/report/github.com/hedhyw/semerr)
+[![Coverage Status](https://coveralls.io/repos/github/hedhyw/semerr/badge.svg?branch=main)](https://coveralls.io/github/hedhyw/semerr?branch=main)
 [![PkgGoDev](https://pkg.go.dev/badge/github.com/hedhyw/semerr)](https://pkg.go.dev/github.com/hedhyw/semerr?tab=doc)
-
 
 Package `semerr` helps to work with errors in Golang.
 
