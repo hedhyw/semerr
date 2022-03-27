@@ -6,6 +6,10 @@ package semerr
 //
 // It indicates that the server did not receive a complete request
 // message within the time that it was prepared to wait.
+//
+// It represents following statuses:
+// - HTTP code: Request Timeout (408).
+// - GRPC code: Canceled (1).
 type StatusRequestTimeoutError struct {
 	temporaryWrappedError
 }
@@ -14,6 +18,10 @@ type StatusRequestTimeoutError struct {
 //
 // It indicates that the server did not receive a complete request
 // message within the time that it was prepared to wait.
+//
+// It represents following statuses:
+// - HTTP code: Request Timeout (408).
+// - GRPC code: Canceled (1).
 //
 // If err is nil it returns nil.
 func NewStatusRequestTimeoutError(err error) error {
@@ -28,6 +36,10 @@ func NewStatusRequestTimeoutError(err error) error {
 //
 // It indicates that the server encountered an unexpected
 // condition that prevented it from fulfilling the request.
+//
+// It represents following statuses:
+// - HTTP code: Internal Server Error (500).
+// - GRPC code: Unknown (2).
 type InternalServerError struct {
 	permanentWrappedError
 }
@@ -36,6 +48,10 @@ type InternalServerError struct {
 //
 // It indicates that the server encountered an unexpected
 // condition that prevented it from fulfilling the request.
+//
+// It represents following statuses:
+// - HTTP code: Internal Server Error (500).
+// - GRPC code: Unknown (2).
 //
 // If err is nil it returns nil.
 func NewInternalServerError(err error) error {
@@ -50,6 +66,10 @@ func NewInternalServerError(err error) error {
 //
 // It indicates that the server cannot or will not process the
 // request due to something that is perceived to be a client error.
+//
+// It represents following statuses:
+// - HTTP code: Bad Request (400).
+// - GRPC code: InvalidArgument (3).
 type BadRequestError struct {
 	permanentWrappedError
 }
@@ -58,6 +78,10 @@ type BadRequestError struct {
 //
 // It indicates that the server cannot or will not process the
 // request due to something that is perceived to be a client error.
+//
+// It represents following statuses:
+// - HTTP code: Bad Request (400).
+// - GRPC code: InvalidArgument (3).
 //
 // If err is nil it returns nil.
 func NewBadRequestError(err error) error {
@@ -73,6 +97,10 @@ func NewBadRequestError(err error) error {
 // It indicates indicates that the origin server is refusing
 // to service the request because the content is in a format
 // not supported by this method on the target resource.
+//
+// It represents following statuses:
+// - HTTP code: Unsupported Media Type (415).
+// - GRPC code: InvalidArgument (3).
 type UnsupportedMediaTypeError struct {
 	permanentWrappedError
 }
@@ -82,6 +110,10 @@ type UnsupportedMediaTypeError struct {
 // It indicates indicates that the origin server is refusing
 // to service the request because the content is in a format
 // not supported by this method on the target resource.
+//
+// It represents following statuses:
+// - HTTP code: Unsupported Media Type (415).
+// - GRPC code: InvalidArgument (3).
 //
 // If err is nil it returns nil.
 func NewUnsupportedMediaTypeError(err error) error {
@@ -97,6 +129,10 @@ func NewUnsupportedMediaTypeError(err error) error {
 // It indicates that the server, while acting as a gateway or
 // proxy, did not receive a timely response from an upstream
 // server it needed to access in order to complete the request.
+//
+// It represents following statuses:
+// - HTTP code: Gateway Timeout (504).
+// - GRPC code: DeadlineExceeded (4).
 type StatusGatewayTimeoutError struct {
 	temporaryWrappedError
 }
@@ -106,6 +142,10 @@ type StatusGatewayTimeoutError struct {
 // It indicates that the server, while acting as a gateway or
 // proxy, did not receive a timely response from an upstream
 // server it needed to access in order to complete the request.
+//
+// It represents following statuses:
+// - HTTP code: Gateway Timeout (504).
+// - GRPC code: DeadlineExceeded (4).
 //
 // If err is nil it returns nil.
 func NewStatusGatewayTimeoutError(err error) error {
@@ -121,6 +161,10 @@ func NewStatusGatewayTimeoutError(err error) error {
 // It indicates that the origin server did not find a current
 // representation for the target resource or is not willing to
 // disclose that one exists.
+//
+// It represents following statuses:
+// - HTTP code: Not Found (404).
+// - GRPC code: NotFound (5).
 type NotFoundError struct {
 	permanentWrappedError
 }
@@ -130,6 +174,10 @@ type NotFoundError struct {
 // It indicates that the origin server did not find a current
 // representation for the target resource or is not willing to
 // disclose that one exists.
+//
+// It represents following statuses:
+// - HTTP code: Not Found (404).
+// - GRPC code: NotFound (5).
 //
 // If err is nil it returns nil.
 func NewNotFoundError(err error) error {
@@ -144,6 +192,10 @@ func NewNotFoundError(err error) error {
 //
 // It indicates that the request could not be completed due to
 // a conflict with the current state of the target resource.
+//
+// It represents following statuses:
+// - HTTP code: Conflict (409).
+// - GRPC code: AlreadyExists (6).
 type ConflictError struct {
 	permanentWrappedError
 }
@@ -152,6 +204,10 @@ type ConflictError struct {
 //
 // It indicates that the request could not be completed due to
 // a conflict with the current state of the target resource.
+//
+// It represents following statuses:
+// - HTTP code: Conflict (409).
+// - GRPC code: AlreadyExists (6).
 //
 // If err is nil it returns nil.
 func NewConflictError(err error) error {
@@ -166,6 +222,10 @@ func NewConflictError(err error) error {
 //
 // It indicates that the server understood the request but
 // refuses to fulfill it.
+//
+// It represents following statuses:
+// - HTTP code: Forbidden (403).
+// - GRPC code: PermissionDenied (7).
 type ForbiddenError struct {
 	permanentWrappedError
 }
@@ -174,6 +234,10 @@ type ForbiddenError struct {
 //
 // It indicates that the server understood the request but
 // refuses to fulfill it.
+//
+// It represents following statuses:
+// - HTTP code: Forbidden (403).
+// - GRPC code: PermissionDenied (7).
 //
 // If err is nil it returns nil.
 func NewForbiddenError(err error) error {
@@ -188,6 +252,10 @@ func NewForbiddenError(err error) error {
 //
 // It indicates the user has sent too many requests in a given
 // amount of time.
+//
+// It represents following statuses:
+// - HTTP code: Too Many Requests (429).
+// - GRPC code: ResourceExhausted (8).
 type TooManyRequestsError struct {
 	permanentWrappedError
 }
@@ -196,6 +264,10 @@ type TooManyRequestsError struct {
 //
 // It indicates the user has sent too many requests in a given
 // amount of time.
+//
+// It represents following statuses:
+// - HTTP code: Too Many Requests (429).
+// - GRPC code: ResourceExhausted (8).
 //
 // If err is nil it returns nil.
 func NewTooManyRequestsError(err error) error {
@@ -211,6 +283,10 @@ func NewTooManyRequestsError(err error) error {
 // It indicates that the server is refusing to process
 // a request because the request content is larger than
 // the server
+//
+// It represents following statuses:
+// - HTTP code: Request Entity Too Large (413).
+// - GRPC code: OutOfRange (11).
 type RequestEntityTooLargeError struct {
 	permanentWrappedError
 }
@@ -220,6 +296,10 @@ type RequestEntityTooLargeError struct {
 // It indicates that the server is refusing to process
 // a request because the request content is larger than
 // the server
+//
+// It represents following statuses:
+// - HTTP code: Request Entity Too Large (413).
+// - GRPC code: OutOfRange (11).
 //
 // If err is nil it returns nil.
 func NewRequestEntityTooLargeError(err error) error {
@@ -234,6 +314,10 @@ func NewRequestEntityTooLargeError(err error) error {
 //
 // It indicates that the server does not support
 // the functionality required to fulfill the request.
+//
+// It represents following statuses:
+// - HTTP code: Not Implemented (501).
+// - GRPC code: Unimplemented (12).
 type UnimplementedError struct {
 	permanentWrappedError
 }
@@ -242,6 +326,10 @@ type UnimplementedError struct {
 //
 // It indicates that the server does not support
 // the functionality required to fulfill the request.
+//
+// It represents following statuses:
+// - HTTP code: Not Implemented (501).
+// - GRPC code: Unimplemented (12).
 //
 // If err is nil it returns nil.
 func NewUnimplementedError(err error) error {
@@ -256,6 +344,10 @@ func NewUnimplementedError(err error) error {
 //
 // It indicates that the server is not ready to handle
 // the request.
+//
+// It represents following statuses:
+// - HTTP code: Service Unavailable (503).
+// - GRPC code: Unavailable (14).
 type ServiceUnavailableError struct {
 	temporaryWrappedError
 }
@@ -264,6 +356,10 @@ type ServiceUnavailableError struct {
 //
 // It indicates that the server is not ready to handle
 // the request.
+//
+// It represents following statuses:
+// - HTTP code: Service Unavailable (503).
+// - GRPC code: Unavailable (14).
 //
 // If err is nil it returns nil.
 func NewServiceUnavailableError(err error) error {
@@ -279,6 +375,10 @@ func NewServiceUnavailableError(err error) error {
 // It indicates that the request has not been applied because
 // it lacks valid authentication credentials for the target
 // resource.
+//
+// It represents following statuses:
+// - HTTP code: Unauthorized (401).
+// - GRPC code: Unauthenticated (16).
 type UnauthorizedError struct {
 	permanentWrappedError
 }
@@ -288,6 +388,10 @@ type UnauthorizedError struct {
 // It indicates that the request has not been applied because
 // it lacks valid authentication credentials for the target
 // resource.
+//
+// It represents following statuses:
+// - HTTP code: Unauthorized (401).
+// - GRPC code: Unauthenticated (16).
 //
 // If err is nil it returns nil.
 func NewUnauthorizedError(err error) error {

@@ -8,6 +8,7 @@ import (
 	"go/format"
 	"io/fs"
 	"log"
+	"net/http"
 	"os"
 	"path/filepath"
 	"sort"
@@ -18,6 +19,7 @@ import (
 	_ "embed"
 
 	"github.com/hedhyw/semerr/pkg/v1/semerr"
+	"google.golang.org/grpc/codes"
 	"gopkg.in/yaml.v2"
 )
 
@@ -81,6 +83,8 @@ func walkFn(errDefs []errorDefinition) fs.WalkDirFunc {
 
 		tmpl, err := template.New(name).Funcs(template.FuncMap{
 			"multlineComment": multlineComment,
+			"httpStatusText":  http.StatusText,
+			"grpcStatusText":  grpcStatusText,
 		}).ParseFiles(path)
 		if err != nil {
 			return fmt.Errorf("parsing template: %s: %w", name, err)
@@ -177,4 +181,8 @@ func multlineComment(text string) string {
 	}
 
 	return sb.String()
+}
+
+func grpcStatusText(code int) string {
+	return codes.Code(code).String()
 }
