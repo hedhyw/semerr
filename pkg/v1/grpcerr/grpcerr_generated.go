@@ -16,18 +16,28 @@ func Code(err error) codes.Code {
 	switch err.(type) {
 	case nil:
 		return codes.OK
+	case semerr.StatusRequestTimeoutError:
+		return 1
+	case semerr.InternalServerError:
+		return 2
 	case semerr.BadRequestError:
 		return 3
+	case semerr.UnsupportedMediaTypeError:
+		return 3
+	case semerr.StatusGatewayTimeoutError:
+		return 4
+	case semerr.NotFoundError:
+		return 5
 	case semerr.ConflictError:
 		return 6
 	case semerr.ForbiddenError:
 		return 7
-	case semerr.InternalServerError:
-		return 2
-	case semerr.NotFoundError:
-		return 5
+	case semerr.TooManyRequestsError:
+		return 8
 	case semerr.RequestEntityTooLargeError:
 		return 11
+	case semerr.UnimplementedError:
+		return 12
 	case semerr.ServiceUnavailableError:
 		return 14
 	case semerr.UnauthorizedError:

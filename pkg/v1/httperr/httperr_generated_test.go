@@ -29,8 +29,28 @@ func TestCode(t *testing.T) {
 			Code: http.StatusInternalServerError,
 		},
 		{
+			Err:  semerr.NewStatusRequestTimeoutError(err),
+			Code: 408,
+		},
+		{
+			Err:  semerr.NewInternalServerError(err),
+			Code: 500,
+		},
+		{
 			Err:  semerr.NewBadRequestError(err),
 			Code: 400,
+		},
+		{
+			Err:  semerr.NewUnsupportedMediaTypeError(err),
+			Code: 415,
+		},
+		{
+			Err:  semerr.NewStatusGatewayTimeoutError(err),
+			Code: 504,
+		},
+		{
+			Err:  semerr.NewNotFoundError(err),
+			Code: 404,
 		},
 		{
 			Err:  semerr.NewConflictError(err),
@@ -41,16 +61,16 @@ func TestCode(t *testing.T) {
 			Code: 403,
 		},
 		{
-			Err:  semerr.NewInternalServerError(err),
-			Code: 500,
-		},
-		{
-			Err:  semerr.NewNotFoundError(err),
-			Code: 404,
+			Err:  semerr.NewTooManyRequestsError(err),
+			Code: 429,
 		},
 		{
 			Err:  semerr.NewRequestEntityTooLargeError(err),
 			Code: 413,
+		},
+		{
+			Err:  semerr.NewUnimplementedError(err),
+			Code: 501,
 		},
 		{
 			Err:  semerr.NewServiceUnavailableError(err),
@@ -68,9 +88,19 @@ func TestCode(t *testing.T) {
 		t.Run(fmt.Sprint(tc.Err), func(t *testing.T) {
 			t.Parallel()
 
-			gotCode := httperr.Code(tc.Err)
+			err := tc.Err
+			gotCode := httperr.Code(err)
 			if tc.Code != gotCode {
 				t.Fatal("exp", tc.Code, "got", gotCode)
+			}
+
+			if err != nil {
+				err = fmt.Errorf("wrapped: 1: %w", err)
+				err = fmt.Errorf("wrapped: 2: %w", err)
+				gotCode = httperr.Code(err)
+				if tc.Code != gotCode {
+					t.Fatal("exp", tc.Code, "got", gotCode)
+				}
 			}
 		})
 	}

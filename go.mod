@@ -2,7 +2,10 @@ module github.com/hedhyw/semerr
 
 go 1.17
 
-require google.golang.org/grpc v1.41.0
+require (
+	google.golang.org/grpc v1.41.0
+	gopkg.in/yaml.v2 v2.2.3
+)
 
 require (
 	github.com/golang/protobuf v1.4.3 // indirect

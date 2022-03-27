@@ -2,65 +2,41 @@
 
 package semerr
 
-// BadRequestError is a permanent error.
-// It means that the request was corrupted.
-type BadRequestError struct {
-	permanentWrappedError
+// StatusRequestTimeoutError is a temporary error.
+//
+// It indicates that the server did not receive a complete request
+// message within the time that it was prepared to wait.
+type StatusRequestTimeoutError struct {
+	temporaryWrappedError
 }
 
-// NewBadRequestError wraps err and creates BadRequestError.
-// It means that the request was corrupted.
+// NewStatusRequestTimeoutError wraps err and creates StatusRequestTimeoutError.
+//
+// It indicates that the server did not receive a complete request
+// message within the time that it was prepared to wait.
+//
 // If err is nil it returns nil.
-func NewBadRequestError(err error) error {
+func NewStatusRequestTimeoutError(err error) error {
 	if err == nil {
 		return nil
 	}
 
-	return BadRequestError{newPermanentWrappedError(err)}
+	return StatusRequestTimeoutError{newTemporaryWrappedError(err)}
 }
 
-// ConflictError is a permanent error.
-// Attempt to create a resource that already exists.
-type ConflictError struct {
-	permanentWrappedError
-}
-
-// NewConflictError wraps err and creates ConflictError.
-// Attempt to create a resource that already exists.
-// If err is nil it returns nil.
-func NewConflictError(err error) error {
-	if err == nil {
-		return nil
-	}
-
-	return ConflictError{newPermanentWrappedError(err)}
-}
-
-// ForbiddenError is a permanent error.
-// It means that there is no access to a restricted resource.
-type ForbiddenError struct {
-	permanentWrappedError
-}
-
-// NewForbiddenError wraps err and creates ForbiddenError.
-// It means that there is no access to a restricted resource.
-// If err is nil it returns nil.
-func NewForbiddenError(err error) error {
-	if err == nil {
-		return nil
-	}
-
-	return ForbiddenError{newPermanentWrappedError(err)}
-}
-
-// InternalServerError is a permanent error.
-// An unknown unhandled internal server error.
+// InternalServerError is not a temporary error.
+//
+// It indicates that the server encountered an unexpected
+// condition that prevented it from fulfilling the request.
 type InternalServerError struct {
 	permanentWrappedError
 }
 
 // NewInternalServerError wraps err and creates InternalServerError.
-// An unknown unhandled internal server error.
+//
+// It indicates that the server encountered an unexpected
+// condition that prevented it from fulfilling the request.
+//
 // If err is nil it returns nil.
 func NewInternalServerError(err error) error {
 	if err == nil {
@@ -70,14 +46,91 @@ func NewInternalServerError(err error) error {
 	return InternalServerError{newPermanentWrappedError(err)}
 }
 
-// NotFoundError is a permanent error.
-// It means that accessed resource doesn't exist.
+// BadRequestError is not a temporary error.
+//
+// It indicates that the server cannot or will not process the
+// request due to something that is perceived to be a client error.
+type BadRequestError struct {
+	permanentWrappedError
+}
+
+// NewBadRequestError wraps err and creates BadRequestError.
+//
+// It indicates that the server cannot or will not process the
+// request due to something that is perceived to be a client error.
+//
+// If err is nil it returns nil.
+func NewBadRequestError(err error) error {
+	if err == nil {
+		return nil
+	}
+
+	return BadRequestError{newPermanentWrappedError(err)}
+}
+
+// UnsupportedMediaTypeError is not a temporary error.
+//
+// It indicates indicates that the origin server is refusing
+// to service the request because the content is in a format
+// not supported by this method on the target resource.
+type UnsupportedMediaTypeError struct {
+	permanentWrappedError
+}
+
+// NewUnsupportedMediaTypeError wraps err and creates UnsupportedMediaTypeError.
+//
+// It indicates indicates that the origin server is refusing
+// to service the request because the content is in a format
+// not supported by this method on the target resource.
+//
+// If err is nil it returns nil.
+func NewUnsupportedMediaTypeError(err error) error {
+	if err == nil {
+		return nil
+	}
+
+	return UnsupportedMediaTypeError{newPermanentWrappedError(err)}
+}
+
+// StatusGatewayTimeoutError is a temporary error.
+//
+// It indicates that the server, while acting as a gateway or
+// proxy, did not receive a timely response from an upstream
+// server it needed to access in order to complete the request.
+type StatusGatewayTimeoutError struct {
+	temporaryWrappedError
+}
+
+// NewStatusGatewayTimeoutError wraps err and creates StatusGatewayTimeoutError.
+//
+// It indicates that the server, while acting as a gateway or
+// proxy, did not receive a timely response from an upstream
+// server it needed to access in order to complete the request.
+//
+// If err is nil it returns nil.
+func NewStatusGatewayTimeoutError(err error) error {
+	if err == nil {
+		return nil
+	}
+
+	return StatusGatewayTimeoutError{newTemporaryWrappedError(err)}
+}
+
+// NotFoundError is not a temporary error.
+//
+// It indicates that the origin server did not find a current
+// representation for the target resource or is not willing to
+// disclose that one exists.
 type NotFoundError struct {
 	permanentWrappedError
 }
 
 // NewNotFoundError wraps err and creates NotFoundError.
-// It means that accessed resource doesn't exist.
+//
+// It indicates that the origin server did not find a current
+// representation for the target resource or is not willing to
+// disclose that one exists.
+//
 // If err is nil it returns nil.
 func NewNotFoundError(err error) error {
 	if err == nil {
@@ -87,14 +140,87 @@ func NewNotFoundError(err error) error {
 	return NotFoundError{newPermanentWrappedError(err)}
 }
 
-// RequestEntityTooLargeError is a permanent error.
-// It means that the request has too large enities.
+// ConflictError is not a temporary error.
+//
+// It indicates that the request could not be completed due to
+// a conflict with the current state of the target resource.
+type ConflictError struct {
+	permanentWrappedError
+}
+
+// NewConflictError wraps err and creates ConflictError.
+//
+// It indicates that the request could not be completed due to
+// a conflict with the current state of the target resource.
+//
+// If err is nil it returns nil.
+func NewConflictError(err error) error {
+	if err == nil {
+		return nil
+	}
+
+	return ConflictError{newPermanentWrappedError(err)}
+}
+
+// ForbiddenError is not a temporary error.
+//
+// It indicates that the server understood the request but
+// refuses to fulfill it.
+type ForbiddenError struct {
+	permanentWrappedError
+}
+
+// NewForbiddenError wraps err and creates ForbiddenError.
+//
+// It indicates that the server understood the request but
+// refuses to fulfill it.
+//
+// If err is nil it returns nil.
+func NewForbiddenError(err error) error {
+	if err == nil {
+		return nil
+	}
+
+	return ForbiddenError{newPermanentWrappedError(err)}
+}
+
+// TooManyRequestsError is not a temporary error.
+//
+// It indicates the user has sent too many requests in a given
+// amount of time.
+type TooManyRequestsError struct {
+	permanentWrappedError
+}
+
+// NewTooManyRequestsError wraps err and creates TooManyRequestsError.
+//
+// It indicates the user has sent too many requests in a given
+// amount of time.
+//
+// If err is nil it returns nil.
+func NewTooManyRequestsError(err error) error {
+	if err == nil {
+		return nil
+	}
+
+	return TooManyRequestsError{newPermanentWrappedError(err)}
+}
+
+// RequestEntityTooLargeError is not a temporary error.
+//
+// It indicates that the server is refusing to process
+// a request because the request content is larger than
+// the server
 type RequestEntityTooLargeError struct {
 	permanentWrappedError
 }
 
 // NewRequestEntityTooLargeError wraps err and creates RequestEntityTooLargeError.
-// It means that the request has too large enities.
+//
+// It indicates that the server is refusing to process
+// a request because the request content is larger than
+// the server
+//
 // If err is nil it returns nil.
 func NewRequestEntityTooLargeError(err error) error {
 	if err == nil {
@@ -104,14 +230,41 @@ func NewRequestEntityTooLargeError(err error) error {
 	return RequestEntityTooLargeError{newPermanentWrappedError(err)}
 }
 
-// ServiceUnavailableError is a tememporary error.
-// It indicates that the server is not ready to handle the request.
+// UnimplementedError is not a temporary error.
+//
+// It indicates that the server does not support
+// the functionality required to fulfill the request.
+type UnimplementedError struct {
+	permanentWrappedError
+}
+
+// NewUnimplementedError wraps err and creates UnimplementedError.
+//
+// It indicates that the server does not support
+// the functionality required to fulfill the request.
+//
+// If err is nil it returns nil.
+func NewUnimplementedError(err error) error {
+	if err == nil {
+		return nil
+	}
+
+	return UnimplementedError{newPermanentWrappedError(err)}
+}
+
+// ServiceUnavailableError is a temporary error.
+//
+// It indicates that the server is not ready to handle
+// the request.
 type ServiceUnavailableError struct {
 	temporaryWrappedError
 }
 
 // NewServiceUnavailableError wraps err and creates ServiceUnavailableError.
-// It indicates that the server is not ready to handle the request.
+//
+// It indicates that the server is not ready to handle
+// the request.
+//
 // If err is nil it returns nil.
 func NewServiceUnavailableError(err error) error {
 	if err == nil {
@@ -121,14 +274,21 @@ func NewServiceUnavailableError(err error) error {
 	return ServiceUnavailableError{newTemporaryWrappedError(err)}
 }
 
-// UnauthorizedError is a permanent error.
-// It means that there is no access because of authorization restrictions.
+// UnauthorizedError is not a temporary error.
+//
+// It indicates that the request has not been applied because
+// it lacks valid authentication credentials for the target
+// resource.
 type UnauthorizedError struct {
 	permanentWrappedError
 }
 
 // NewUnauthorizedError wraps err and creates UnauthorizedError.
-// It means that there is no access because of authorization restrictions.
+//
+// It indicates that the request has not been applied because
+// it lacks valid authentication credentials for the target
+// resource.
+//
 // If err is nil it returns nil.
 func NewUnauthorizedError(err error) error {
 	if err == nil {

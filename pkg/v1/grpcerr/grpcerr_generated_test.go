@@ -35,8 +35,28 @@ func TestCode(t *testing.T) {
 			Code: codes.AlreadyExists,
 		},
 		{
+			Err:  semerr.NewStatusRequestTimeoutError(err),
+			Code: 1,
+		},
+		{
+			Err:  semerr.NewInternalServerError(err),
+			Code: 2,
+		},
+		{
 			Err:  semerr.NewBadRequestError(err),
 			Code: 3,
+		},
+		{
+			Err:  semerr.NewUnsupportedMediaTypeError(err),
+			Code: 3,
+		},
+		{
+			Err:  semerr.NewStatusGatewayTimeoutError(err),
+			Code: 4,
+		},
+		{
+			Err:  semerr.NewNotFoundError(err),
+			Code: 5,
 		},
 		{
 			Err:  semerr.NewConflictError(err),
@@ -47,16 +67,16 @@ func TestCode(t *testing.T) {
 			Code: 7,
 		},
 		{
-			Err:  semerr.NewInternalServerError(err),
-			Code: 2,
-		},
-		{
-			Err:  semerr.NewNotFoundError(err),
-			Code: 5,
+			Err:  semerr.NewTooManyRequestsError(err),
+			Code: 8,
 		},
 		{
 			Err:  semerr.NewRequestEntityTooLargeError(err),
 			Code: 11,
+		},
+		{
+			Err:  semerr.NewUnimplementedError(err),
+			Code: 12,
 		},
 		{
 			Err:  semerr.NewServiceUnavailableError(err),
@@ -74,9 +94,19 @@ func TestCode(t *testing.T) {
 		t.Run(fmt.Sprint(tc.Err), func(t *testing.T) {
 			t.Parallel()
 
-			gotCode := grpcerr.Code(tc.Err)
+			err := tc.Err
+			gotCode := grpcerr.Code(err)
 			if tc.Code != gotCode {
 				t.Fatal("exp", tc.Code, "got", gotCode)
+			}
+
+			if err != nil {
+				err = fmt.Errorf("wrapped: 1: %w", err)
+				err = fmt.Errorf("wrapped: 2: %w", err)
+				gotCode = grpcerr.Code(err)
+				if tc.Code != gotCode {
+					t.Fatal("exp", tc.Code, "got", gotCode)
+				}
 			}
 		})
 	}

@@ -1,15 +1,16 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"go/format"
 	"io/fs"
 	"log"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"text/template"
 	"time"
@@ -17,6 +18,7 @@ import (
 	_ "embed"
 
 	"github.com/hedhyw/semerr/pkg/v1/semerr"
+	"gopkg.in/yaml.v2"
 )
 
 const (
@@ -28,8 +30,8 @@ const (
 	timeout = 5 * time.Second
 )
 
-//go:embed "errors.json"
-var errorsJSONData []byte
+//go:embed "errors.yaml"
+var errorsYAMLData []byte
 
 func main() {
 	if len(os.Args) != 2 {
@@ -56,13 +58,15 @@ func main() {
 }
 
 type errorDefinition struct {
-	GRPCStatus  int    `json:"grpc"`
-	HTTPStatus  int    `json:"http"`
-	Description string `json:"description"`
-	Permanent   bool   `json:"permanent"`
+	Name string `yaml:"-"`
+
+	GRPCStatus  int    `yaml:"grpc"`
+	HTTPStatus  int    `yaml:"http"`
+	Description string `yaml:"description"`
+	Temporary   bool   `yaml:"temporary"`
 }
 
-func walkFn(errDefs map[string]errorDefinition) fs.WalkDirFunc {
+func walkFn(errDefs []errorDefinition) fs.WalkDirFunc {
 	return func(path string, _ fs.DirEntry, lastErr error) (err error) {
 		if lastErr != nil {
 			return lastErr
@@ -75,7 +79,9 @@ func walkFn(errDefs map[string]errorDefinition) fs.WalkDirFunc {
 		name := filepath.Base(path)
 		baseDir := filepath.Dir(path)
 
-		tmpl, err := template.New(name).ParseFiles(path)
+		tmpl, err := template.New(name).Funcs(template.FuncMap{
+			"multlineComment": multlineComment,
+		}).ParseFiles(path)
 		if err != nil {
 			return fmt.Errorf("parsing template: %s: %w", name, err)
 		}
@@ -124,16 +130,51 @@ func walkFn(errDefs map[string]errorDefinition) fs.WalkDirFunc {
 }
 
 func generate(path string) (err error) {
-	var errDefs map[string]errorDefinition
-	err = json.Unmarshal(errorsJSONData, &errDefs)
+	var errDefs struct {
+		Errors map[string]errorDefinition `yaml:"errors"`
+	}
+
+	err = yaml.Unmarshal(errorsYAMLData, &errDefs)
 	if err != nil {
 		return fmt.Errorf("decoding definitions: %w", err)
 	}
 
-	err = filepath.WalkDir(path, walkFn(errDefs))
+	defs := make([]errorDefinition, 0, len(errDefs.Errors))
+	for name, def := range errDefs.Errors {
+		def.Name = name
+		defs = append(defs, def)
+	}
+
+	sort.Slice(defs, func(i, j int) bool {
+		left, right := defs[i], defs[j]
+
+		if left.GRPCStatus == right.GRPCStatus {
+			return left.HTTPStatus < right.HTTPStatus
+		}
+
+		return left.GRPCStatus < right.GRPCStatus
+	})
+
+	err = filepath.WalkDir(path, walkFn(defs))
 	if err != nil {
 		return fmt.Errorf("walking dir: %w", err)
 	}
 
 	return nil
+}
+
+func multlineComment(text string) string {
+	sb := strings.Builder{}
+	sb.Grow(len(text))
+
+	ss := bufio.NewScanner(strings.NewReader(text))
+	for ss.Scan() {
+		if sb.Len() != 0 {
+			sb.WriteByte('\n')
+		}
+		sb.WriteString("// ")
+		sb.WriteString(ss.Text())
+	}
+
+	return sb.String()
 }
