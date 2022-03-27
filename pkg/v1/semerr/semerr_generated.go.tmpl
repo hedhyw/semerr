@@ -7,6 +7,10 @@ package semerr
 // {{ $errorDef.Name }} is not a temporary error.
 //
 {{ multlineComment $errorDef.Description }}
+//
+// It represents following statuses:
+// - HTTP code: {{ httpStatusText $errorDef.HTTPStatus }} ({{ $errorDef.HTTPStatus }}).
+// - GRPC code: {{ grpcStatusText $errorDef.GRPCStatus }} ({{ $errorDef.GRPCStatus }}).
 type {{ $errorDef.Name }} struct {
 	permanentWrappedError
 }
@@ -14,6 +18,10 @@ type {{ $errorDef.Name }} struct {
 // New{{ $errorDef.Name }} wraps err and creates {{ $errorDef.Name }}.
 //
 {{ multlineComment $errorDef.Description }}
+//
+// It represents following statuses:
+// - HTTP code: {{ httpStatusText $errorDef.HTTPStatus }} ({{ $errorDef.HTTPStatus }}).
+// - GRPC code: {{ grpcStatusText $errorDef.GRPCStatus }} ({{ $errorDef.GRPCStatus }}).
 //
 // If err is nil it returns nil.
 func New{{ $errorDef.Name }}(err error) error {
@@ -27,6 +35,10 @@ func New{{ $errorDef.Name }}(err error) error {
 // {{ $errorDef.Name }} is a temporary error.
 //
 {{ multlineComment $errorDef.Description }}
+//
+// It represents following statuses:
+// - HTTP code: {{ httpStatusText $errorDef.HTTPStatus }} ({{ $errorDef.HTTPStatus }}).
+// - GRPC code: {{ grpcStatusText $errorDef.GRPCStatus }} ({{ $errorDef.GRPCStatus }}).
 type {{ $errorDef.Name }} struct {
 	temporaryWrappedError
 }
@@ -34,6 +46,10 @@ type {{ $errorDef.Name }} struct {
 // New{{ $errorDef.Name }} wraps err and creates {{ $errorDef.Name }}.
 //
 {{ multlineComment $errorDef.Description }}
+//
+// It represents following statuses:
+// - HTTP code: {{ httpStatusText $errorDef.HTTPStatus }} ({{ $errorDef.HTTPStatus }}).
+// - GRPC code: {{ grpcStatusText $errorDef.GRPCStatus }} ({{ $errorDef.GRPCStatus }}).
 //
 // If err is nil it returns nil.
 func New{{ $errorDef.Name }}(err error) error {

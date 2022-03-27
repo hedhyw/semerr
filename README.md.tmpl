@@ -50,6 +50,7 @@ err := errors.New("some error")
 {{- range $errorDef := . }}
 
 {{ multlineComment $errorDef.Description }}
+// HTTP: {{ httpStatusText $errorDef.HTTPStatus }} ({{ $errorDef.HTTPStatus }}); GRPC: {{ grpcStatusText $errorDef.GRPCStatus }} ({{ $errorDef.GRPCStatus }}).
 err = semerr.New{{ $errorDef.Name }}(err)
 {{- end }}
 ```
