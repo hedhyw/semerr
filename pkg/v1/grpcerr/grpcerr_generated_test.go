@@ -3,6 +3,7 @@
 package grpcerr_test
 
 import (
+	"errors"
 	"fmt"
 	"testing"
 
@@ -107,6 +108,108 @@ func TestCode(t *testing.T) {
 				if tc.Code != gotCode {
 					t.Fatal("exp", tc.Code, "got", gotCode)
 				}
+			}
+		})
+	}
+}
+
+func TestWrap(t *testing.T) {
+	t.Parallel()
+
+	const err = semerr.Error("some error")
+
+	testCases := []struct {
+		Code  codes.Code
+		Check func(err error) bool
+	}{
+		{
+			Check: func(actualErr error) bool {
+				return err == actualErr
+			},
+			Code: 100,
+		},
+		{
+			Check: func(err error) bool {
+				return errors.As(err, &semerr.StatusRequestTimeoutError{})
+			},
+			Code: 1,
+		},
+		{
+			Check: func(err error) bool {
+				return errors.As(err, &semerr.InternalServerError{})
+			},
+			Code: 2,
+		},
+		{
+			Check: func(err error) bool {
+				return errors.As(err, &semerr.BadRequestError{})
+			},
+			Code: 3,
+		},
+		{
+			Check: func(err error) bool {
+				return errors.As(err, &semerr.StatusGatewayTimeoutError{})
+			},
+			Code: 4,
+		},
+		{
+			Check: func(err error) bool {
+				return errors.As(err, &semerr.NotFoundError{})
+			},
+			Code: 5,
+		},
+		{
+			Check: func(err error) bool {
+				return errors.As(err, &semerr.ConflictError{})
+			},
+			Code: 6,
+		},
+		{
+			Check: func(err error) bool {
+				return errors.As(err, &semerr.ForbiddenError{})
+			},
+			Code: 7,
+		},
+		{
+			Check: func(err error) bool {
+				return errors.As(err, &semerr.TooManyRequestsError{})
+			},
+			Code: 8,
+		},
+		{
+			Check: func(err error) bool {
+				return errors.As(err, &semerr.RequestEntityTooLargeError{})
+			},
+			Code: 11,
+		},
+		{
+			Check: func(err error) bool {
+				return errors.As(err, &semerr.UnimplementedError{})
+			},
+			Code: 12,
+		},
+		{
+			Check: func(err error) bool {
+				return errors.As(err, &semerr.ServiceUnavailableError{})
+			},
+			Code: 14,
+		},
+		{
+			Check: func(err error) bool {
+				return errors.As(err, &semerr.UnauthorizedError{})
+			},
+			Code: 16,
+		},
+	}
+
+	for _, tc := range testCases {
+		tc := tc
+
+		t.Run(fmt.Sprint(tc.Code), func(t *testing.T) {
+			t.Parallel()
+
+			if err := grpcerr.Wrap(err, tc.Code); !tc.Check(err) {
+				t.Fatalf("%T", err)
 			}
 		})
 	}

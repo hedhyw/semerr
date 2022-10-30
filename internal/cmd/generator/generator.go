@@ -66,6 +66,7 @@ type errorDefinition struct {
 	HTTPStatus  int    `yaml:"http"`
 	Description string `yaml:"description"`
 	Temporary   bool   `yaml:"temporary"`
+	Reverse     bool   `yaml:"reverse"`
 }
 
 func walkFn(errDefs []errorDefinition) fs.WalkDirFunc {

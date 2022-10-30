@@ -3,6 +3,7 @@
 package grpcerr_test
 
 import (
+	"errors"
 	"fmt"
 	"testing"
 
@@ -61,6 +62,46 @@ func TestCode(t *testing.T) {
 				if tc.Code != gotCode {
 					t.Fatal("exp", tc.Code, "got", gotCode)
 				}
+			}
+		})
+	}
+}
+
+func TestWrap(t *testing.T) {
+	t.Parallel()
+
+	const err = semerr.Error("some error")
+
+	testCases := []struct {
+		Code  codes.Code
+		Check func(err error) bool
+	}{
+		{
+			Check: func(actualErr error) bool {
+				return err == actualErr
+			},
+			Code: 100,
+		},
+		{{- range $errorDef := . }}
+		{{- if $errorDef.Reverse }}
+		{
+			Check: func(err error) bool {
+				return errors.As(err, &semerr.{{ $errorDef.Name }}{})
+			},
+			Code:   {{ $errorDef.GRPCStatus }},
+		},
+		{{- end }}
+		{{- end }}
+	}
+
+		for _, tc := range testCases {
+		tc := tc
+
+		t.Run(fmt.Sprint(tc.Code), func(t *testing.T) {
+			t.Parallel()
+
+			if err := grpcerr.Wrap(err, tc.Code); !tc.Check(err) {
+				t.Fatalf("%T", err)
 			}
 		})
 	}

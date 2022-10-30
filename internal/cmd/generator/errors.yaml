@@ -6,6 +6,7 @@ errors:
         grpc: 1
         http: 408
         temporary: true
+        reverse: true
     "InternalServerError":
         description: |
             It indicates that the server encountered an unexpected
@@ -13,6 +14,7 @@ errors:
         grpc: 2
         http: 500
         temporary: false
+        reverse: true
     "BadRequestError":
         description: |
             It indicates that the server cannot or will not process the
@@ -20,6 +22,7 @@ errors:
         grpc: 3
         http: 400
         temporary: false
+        reverse: true
     "StatusGatewayTimeoutError":
         description: |
             It indicates that the server, while acting as a gateway or
@@ -28,6 +31,7 @@ errors:
         grpc: 4
         http: 504
         temporary: true
+        reverse: true
     "NotFoundError":
         description: |
             It indicates that the origin server did not find a current
@@ -36,6 +40,7 @@ errors:
         grpc: 5
         http: 404
         temporary: false
+        reverse: true
     "ConflictError":
         description: |
             It indicates that the request could not be completed due to
@@ -43,6 +48,7 @@ errors:
         grpc: 6
         http: 409
         temporary: false
+        reverse: true
     "ForbiddenError":
         description: |
             It indicates that the server understood the request but
@@ -50,6 +56,7 @@ errors:
         grpc: 7
         http: 403
         temporary: false
+        reverse: true
     "UnauthorizedError":
         description: |
             It indicates that the request has not been applied because
@@ -58,6 +65,7 @@ errors:
         grpc: 16
         http: 401
         temporary: false
+        reverse: true
     "TooManyRequestsError":
         description: |
             It indicates the user has sent too many requests in a given
@@ -65,6 +73,7 @@ errors:
         grpc: 8
         http: 429
         temporary: false
+        reverse: true
     "RequestEntityTooLargeError":
         description: |
             It indicates that the server is refusing to process
@@ -73,6 +82,7 @@ errors:
         grpc: 11
         http: 413
         temporary: false
+        reverse: true
     "ServiceUnavailableError":
         description: |
             It indicates that the server is not ready to handle
@@ -80,6 +90,7 @@ errors:
         grpc: 14
         http: 503
         temporary: true
+        reverse: true
     "UnimplementedError":
         description: |
             It indicates that the server does not support
@@ -87,6 +98,7 @@ errors:
         grpc: 12
         http: 501
         temporary: false
+        reverse: true
     "UnsupportedMediaTypeError":
         description: |
             It indicates indicates that the origin server is refusing
@@ -95,3 +107,4 @@ errors:
         grpc: 3
         http: 415
         temporary: false
+        reverse: false
