@@ -12,26 +12,78 @@ Package `semerr` helps to work with errors in Golang.
 
 <img alr="Go Bug" src="https://raw.githubusercontent.com/ashleymcnamara/gophers/master/GO_BUG.png" width="100px">
 
-## Const error
+## Status errors
 
-An error that can be defined as `const`.
+Those errors are based on HTTP status names, but they are designed to be
+transport-independent. For example `semerr.NewNotFoundError(err)` indicates
+that something is not found
+(and it is possible to extract HTTP status -> `404` and gRPC status -> `5` if required).
 
+Small example:
 ```go
-var errMutable error = errors.New("mutable error") // Do not like this?
-const errImmutable semerr.Error = "immutable error" // So use this.
+// Repository layer.
+
+type RedisUserRepo struct {}
+
+func (r RedisUserRepo) Get(ctx context.Context, id string) (entity.User, error) {
+    u, err := r.client.Get(id)
+
+    switch {
+    case err == nil:
+        return u, nil
+    case errors.Is(err, redis.ErrNil):
+        return entity.User{}, semerr.NewNotFoundError(err)
+    default:
+        return entity.User{}, fmt.Errorf("getting user: %w", err)
+    }
+}
+
+// Domain layer.
+
+func (c *Core) CreateOrder(ctx context.Context, order entity.Order) (err error)
+    user, err := c.userRepo.GetCurrentUser(ctx)
+    switch {
+    case err == nil:
+        // OK. Go on.
+    case errors.As(err, &semerr.NotFoundError{}):
+        // Repository can have any implementation and we should NOT know about
+        // `sql.ErrNoRows`, `redis.Nil`, `mongo.NoKey`, so we just compare the `err` to
+        // `semerr.NotFoundError`.
+        //
+        // We still can check `errors.Is(err, redis.Nil)` if we want,
+        // because the `err` is just wrapped without any modifications!
+        //
+        // Also we can change meaning by rewrapping the `err`. Check the next line:
+        return fmt.Errorf("getting user: %w", semerr.NewUnauthorizedError(err))
+    default:
+        return fmt.Errorf("getting user: %w" ,err)
+    }
+    
+    // ...
+}
+
+// Transport layer.
+
+func (s *Server) handleCreateOrder(w http.ResponseWriter, r *http.Request) {
+    ctx := r.Context()
+
+    /* ... */
+
+    err := s.core.CreateOrder(ctx, order)
+    if err != nil {
+        // Respond with the correct status.
+        w.WriteHeader(httperr.Code(err))
+
+        // It is better to organize a helper for `err` responding.
+
+        return
+    }
+
+    w.WriteHeader(http.StatusOK)
+}
 ```
 
-## TemporaryError checking
-
-The function `semerr.IsTemporaryError` checks that error has Temporary
-method and it returns true.
-
-```go
-semerr.IsTemporaryError(context.DeadlineExceeded) // true
-semerr.IsTemporaryError(context.Canceled) // false
-```
-
-## Errors with meaning
+## Mechanics
 
 ```go
 errOriginal := errors.New("some error")
@@ -42,9 +94,19 @@ fmt.Println(httperr.Code(errWrapped)) // http.StatusBadRequest
 fmt.Println(grpcerr.Code(errWrapped)) // codes.InvalidArgument
 fmt.Println(errors.Is(err, errOriginal)) // true
 fmt.Println(semerr.NewBadRequestError(nil)) // nil
+fmt.Println(httperr.Wrap(errOriginal, http.StatusBadRequest)) // = semerr.NewBadRequestError(errOriginal)
 ```
 
-Also see:
+## Const error
+
+An error that can be defined as `const`.
+
+```go
+var errMutable error = errors.New("mutable error") // Do not like this?
+const errImmutable semerr.Error = "immutable error" // So use this.
+```
+
+## Also see
 ```go
 err := errors.New("some error")
 {{- range $errorDef := . }}

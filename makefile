@@ -1,5 +1,5 @@
 FILES_DIR?=$(PWD)/pkg/v1
-GOLANGCI_LINT_VER:=v1.45.2
+GOLANGCI_LINT_VER:=v1.50.1
 
 all: generate lint test
 .PHONY: all

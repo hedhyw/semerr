@@ -48,3 +48,37 @@ func Code(err error) int {
 
 	return Code(err)
 }
+
+// Wrap wraps the `err` with an error corresponding to the `code`.
+// If there is no `err` for this code then the `err` will be returned
+// without wrapping.
+func Wrap(err error, code int) error {
+	switch code {
+	case 408:
+		return semerr.NewStatusRequestTimeoutError(err)
+	case 500:
+		return semerr.NewInternalServerError(err)
+	case 400:
+		return semerr.NewBadRequestError(err)
+	case 504:
+		return semerr.NewStatusGatewayTimeoutError(err)
+	case 404:
+		return semerr.NewNotFoundError(err)
+	case 409:
+		return semerr.NewConflictError(err)
+	case 403:
+		return semerr.NewForbiddenError(err)
+	case 429:
+		return semerr.NewTooManyRequestsError(err)
+	case 413:
+		return semerr.NewRequestEntityTooLargeError(err)
+	case 501:
+		return semerr.NewUnimplementedError(err)
+	case 503:
+		return semerr.NewServiceUnavailableError(err)
+	case 401:
+		return semerr.NewUnauthorizedError(err)
+	default:
+		return err
+	}
+}

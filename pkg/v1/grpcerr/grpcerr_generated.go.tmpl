@@ -33,3 +33,19 @@ func Code(err error) codes.Code {
 
 	return Code(err)
 }
+
+// Wrap wraps the `err` with an error corresponding to the `code`.
+// If there is no `err` for this code then the `err` will be returned
+// without wrapping.
+func Wrap(err error, code codes.Code) error {
+	switch code {
+	{{- range $errorDef := . }}
+	{{- if $errorDef.Reverse }}
+	case {{ $errorDef.GRPCStatus }}:
+		return semerr.New{{ $errorDef.Name }}(err)
+	{{- end }}
+	{{- end }}
+	default:
+		return err
+	}
+}

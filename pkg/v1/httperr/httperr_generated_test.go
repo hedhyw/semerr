@@ -3,6 +3,7 @@
 package httperr_test
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"testing"
@@ -101,6 +102,108 @@ func TestCode(t *testing.T) {
 				if tc.Code != gotCode {
 					t.Fatal("exp", tc.Code, "got", gotCode)
 				}
+			}
+		})
+	}
+}
+
+func TestWrap(t *testing.T) {
+	t.Parallel()
+
+	const err = semerr.Error("some error")
+
+	testCases := []struct {
+		Code  int
+		Check func(err error) bool
+	}{
+		{
+			Check: func(actualErr error) bool {
+				return err == actualErr
+			},
+			Code: -1,
+		},
+		{
+			Check: func(err error) bool {
+				return errors.As(err, &semerr.StatusRequestTimeoutError{})
+			},
+			Code: 408,
+		},
+		{
+			Check: func(err error) bool {
+				return errors.As(err, &semerr.InternalServerError{})
+			},
+			Code: 500,
+		},
+		{
+			Check: func(err error) bool {
+				return errors.As(err, &semerr.BadRequestError{})
+			},
+			Code: 400,
+		},
+		{
+			Check: func(err error) bool {
+				return errors.As(err, &semerr.StatusGatewayTimeoutError{})
+			},
+			Code: 504,
+		},
+		{
+			Check: func(err error) bool {
+				return errors.As(err, &semerr.NotFoundError{})
+			},
+			Code: 404,
+		},
+		{
+			Check: func(err error) bool {
+				return errors.As(err, &semerr.ConflictError{})
+			},
+			Code: 409,
+		},
+		{
+			Check: func(err error) bool {
+				return errors.As(err, &semerr.ForbiddenError{})
+			},
+			Code: 403,
+		},
+		{
+			Check: func(err error) bool {
+				return errors.As(err, &semerr.TooManyRequestsError{})
+			},
+			Code: 429,
+		},
+		{
+			Check: func(err error) bool {
+				return errors.As(err, &semerr.RequestEntityTooLargeError{})
+			},
+			Code: 413,
+		},
+		{
+			Check: func(err error) bool {
+				return errors.As(err, &semerr.UnimplementedError{})
+			},
+			Code: 501,
+		},
+		{
+			Check: func(err error) bool {
+				return errors.As(err, &semerr.ServiceUnavailableError{})
+			},
+			Code: 503,
+		},
+		{
+			Check: func(err error) bool {
+				return errors.As(err, &semerr.UnauthorizedError{})
+			},
+			Code: 401,
+		},
+	}
+
+	for _, tc := range testCases {
+		tc := tc
+
+		t.Run(fmt.Sprint(tc.Code), func(t *testing.T) {
+			t.Parallel()
+
+			if err := httperr.Wrap(err, tc.Code); !tc.Check(err) {
+				t.Fatalf("%T", err)
 			}
 		})
 	}
