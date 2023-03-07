@@ -9,44 +9,41 @@ import (
 	"github.com/hedhyw/semerr/pkg/v1/semerr"
 )
 
-// Code returns http status code for err.
+// Code returns http status code for err. In case of joined errors
+// it returns the first code found in the chain.
 func Code(err error) int {
-	switch err.(type) {
-	case nil:
+	switch {
+	case err == nil:
 		return http.StatusOK
-	case semerr.StatusRequestTimeoutError:
+	case errors.As(err, &semerr.StatusRequestTimeoutError{}):
 		return 408
-	case semerr.InternalServerError:
+	case errors.As(err, &semerr.InternalServerError{}):
 		return 500
-	case semerr.BadRequestError:
+	case errors.As(err, &semerr.BadRequestError{}):
 		return 400
-	case semerr.UnsupportedMediaTypeError:
+	case errors.As(err, &semerr.UnsupportedMediaTypeError{}):
 		return 415
-	case semerr.StatusGatewayTimeoutError:
+	case errors.As(err, &semerr.StatusGatewayTimeoutError{}):
 		return 504
-	case semerr.NotFoundError:
+	case errors.As(err, &semerr.NotFoundError{}):
 		return 404
-	case semerr.ConflictError:
+	case errors.As(err, &semerr.ConflictError{}):
 		return 409
-	case semerr.ForbiddenError:
+	case errors.As(err, &semerr.ForbiddenError{}):
 		return 403
-	case semerr.TooManyRequestsError:
+	case errors.As(err, &semerr.TooManyRequestsError{}):
 		return 429
-	case semerr.RequestEntityTooLargeError:
+	case errors.As(err, &semerr.RequestEntityTooLargeError{}):
 		return 413
-	case semerr.UnimplementedError:
+	case errors.As(err, &semerr.UnimplementedError{}):
 		return 501
-	case semerr.ServiceUnavailableError:
+	case errors.As(err, &semerr.ServiceUnavailableError{}):
 		return 503
-	case semerr.UnauthorizedError:
+	case errors.As(err, &semerr.UnauthorizedError{}):
 		return 401
-	}
-
-	if err = errors.Unwrap(err); err == nil {
+	default:
 		return http.StatusInternalServerError
 	}
-
-	return Code(err)
 }
 
 // Wrap wraps the `err` with an error corresponding to the `code`.

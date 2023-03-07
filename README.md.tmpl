@@ -8,7 +8,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/hedhyw/semerr/badge.svg?branch=main)](https://coveralls.io/github/hedhyw/semerr?branch=main)
 [![PkgGoDev](https://pkg.go.dev/badge/github.com/hedhyw/semerr)](https://pkg.go.dev/github.com/hedhyw/semerr?tab=doc)
 
-Package `semerr` helps to work with errors in Golang.
+Package `semerr` helps to work with errors in Golang. It supports go 1.20 [errors.Join](https://pkg.go.dev/errors#Join).
 
 <img alr="Go Bug" src="https://raw.githubusercontent.com/ashleymcnamara/gophers/master/GO_BUG.png" width="100px">
 
@@ -88,10 +88,13 @@ func (s *Server) handleCreateOrder(w http.ResponseWriter, r *http.Request) {
 ```go
 errOriginal := errors.New("some error")
 errWrapped := semerr.NewBadRequestError(errOriginal) // The text will be the same.
+errJoined := errors.Join(errOriginal, errWrapped) // It supports joined errors.
 
 fmt.Println(errWrapped) // "some error"
 fmt.Println(httperr.Code(errWrapped)) // http.StatusBadRequest
+fmt.Println(httperr.Code(errJoined)) // http.StatusBadRequest
 fmt.Println(grpcerr.Code(errWrapped)) // codes.InvalidArgument
+fmt.Println(grpcerr.Code(errJoined)) // codes.InvalidArgument
 fmt.Println(errors.Is(err, errOriginal)) // true
 fmt.Println(semerr.NewBadRequestError(nil)) // nil
 fmt.Println(httperr.Wrap(errOriginal, http.StatusBadRequest)) // = semerr.NewBadRequestError(errOriginal)
