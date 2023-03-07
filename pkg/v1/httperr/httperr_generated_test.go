@@ -208,3 +208,19 @@ func TestWrap(t *testing.T) {
 		})
 	}
 }
+
+func TestJoin(t *testing.T) {
+	t.Parallel()
+
+	const err = semerr.Error("some error")
+
+	gotCode := httperr.Code(errors.Join(
+		fmt.Errorf("regular: %w", err),
+		fmt.Errorf("bad request: %w", semerr.NewBadRequestError(err)),
+		semerr.NewNotFoundError(fmt.Errorf("not found: %w", err)),
+	))
+
+	if gotCode != http.StatusBadRequest {
+		t.Fatal("exp", http.StatusBadRequest, "got", gotCode)
+	}
+}

@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"go/format"
 	"io/fs"
@@ -18,7 +19,6 @@ import (
 
 	_ "embed"
 
-	"github.com/hedhyw/semerr/pkg/v1/semerr"
 	"google.golang.org/grpc/codes"
 	"gopkg.in/yaml.v2"
 )
@@ -106,7 +106,7 @@ func walkFn(errDefs []errorDefinition) fs.WalkDirFunc {
 			return fmt.Errorf("opening out file: %w", err)
 		}
 
-		defer func() { err = semerr.NewMultiError(err, f.Close()) }()
+		defer func() { err = errors.Join(err, f.Close()) }()
 
 		var buf bytes.Buffer
 		err = tmpl.Execute(&buf, errDefs)

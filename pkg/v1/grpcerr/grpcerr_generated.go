@@ -11,49 +11,63 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// Code returns grpc status code for err.
+// Code returns grpc status code for err. In case of joined errors
+// it returns the first code found in the chain.
 func Code(err error) codes.Code {
-	switch err.(type) {
-	case nil:
+	switch {
+	case err == nil:
 		return codes.OK
-	case semerr.StatusRequestTimeoutError:
+	case errors.As(err, &semerr.StatusRequestTimeoutError{}):
 		return 1
-	case semerr.InternalServerError:
+	case errors.As(err, &semerr.InternalServerError{}):
 		return 2
-	case semerr.BadRequestError:
+	case errors.As(err, &semerr.BadRequestError{}):
 		return 3
-	case semerr.UnsupportedMediaTypeError:
+	case errors.As(err, &semerr.UnsupportedMediaTypeError{}):
 		return 3
-	case semerr.StatusGatewayTimeoutError:
+	case errors.As(err, &semerr.StatusGatewayTimeoutError{}):
 		return 4
-	case semerr.NotFoundError:
+	case errors.As(err, &semerr.NotFoundError{}):
 		return 5
-	case semerr.ConflictError:
+	case errors.As(err, &semerr.ConflictError{}):
 		return 6
-	case semerr.ForbiddenError:
+	case errors.As(err, &semerr.ForbiddenError{}):
 		return 7
-	case semerr.TooManyRequestsError:
+	case errors.As(err, &semerr.TooManyRequestsError{}):
 		return 8
-	case semerr.RequestEntityTooLargeError:
+	case errors.As(err, &semerr.RequestEntityTooLargeError{}):
 		return 11
-	case semerr.UnimplementedError:
+	case errors.As(err, &semerr.UnimplementedError{}):
 		return 12
-	case semerr.ServiceUnavailableError:
+	case errors.As(err, &semerr.ServiceUnavailableError{}):
 		return 14
-	case semerr.UnauthorizedError:
+	case errors.As(err, &semerr.UnauthorizedError{}):
 		return 16
+	default:
+		return getGRPCErrorCode(err)
+	}
+}
+
+func getGRPCErrorCode(err error) codes.Code {
+	var errGRPC interface {
+		GRPCStatus() *status.Status
+		error
 	}
 
-	code := status.Code(err)
-	if code != codes.OK && code != codes.Unknown {
-		return code
+	if errors.As(err, &errGRPC) {
+		status := errGRPC.GRPCStatus()
+
+		if status == nil {
+			return codes.Unknown
+		}
+
+		code := status.Code()
+		if code != codes.OK && code != codes.Unknown {
+			return code
+		}
 	}
 
-	if err = errors.Unwrap(err); err == nil {
-		return codes.Unknown
-	}
-
-	return Code(err)
+	return codes.Unknown
 }
 
 // Wrap wraps the `err` with an error corresponding to the `code`.
