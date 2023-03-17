@@ -6,22 +6,46 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/hedhyw/semerr/internal/pkg/multierr"
 	"github.com/hedhyw/semerr/pkg/v1/semerr"
 )
 
 // Code returns http status code for err. In case of joined errors
 // it returns the first code found in the chain.
 func Code(err error) int {
-	switch {
-	case err == nil:
-		return http.StatusOK
-	{{- range $errorDef := . }}
-	case errors.As(err, &semerr.{{ $errorDef.Name }}{}):
-		return {{ $errorDef.HTTPStatus }}
-	{{- end }}
-	default:
+	code := codeRecursion(err)
+	if code == 0 {
 		return http.StatusInternalServerError
 	}
+
+	return code
+}
+
+func codeRecursion(err error) int {
+	switch err.(type) {
+	case nil:
+		return http.StatusOK
+	{{- range $errorDef := . }}
+	case semerr.{{ $errorDef.Name }}:
+		return {{ $errorDef.HTTPStatus }}
+	{{- end }}
+	}
+
+	if err := errors.Unwrap(err); err != nil {
+		return codeRecursion(err)
+	}
+
+	if multiErr, ok := err.(multierr.MultiError); ok && multiErr != nil {
+		for _, err := range multiErr.Unwrap() {
+			code := codeRecursion(err)
+
+			if code != 0 {
+				return code
+			}
+		}
+	}
+
+	return 0
 }
 
 // Wrap wraps the `err` with an error corresponding to the `code`.

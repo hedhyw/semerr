@@ -5,6 +5,7 @@ package grpcerr
 import (
 	"errors"
 
+	"github.com/hedhyw/semerr/internal/pkg/multierr"
 	"github.com/hedhyw/semerr/pkg/v1/semerr"
 
 	"google.golang.org/grpc/codes"
@@ -14,38 +15,61 @@ import (
 // Code returns grpc status code for err. In case of joined errors
 // it returns the first code found in the chain.
 func Code(err error) codes.Code {
-	switch {
-	case err == nil:
+	return codeRecursion(err)
+}
+
+func codeRecursion(err error) codes.Code {
+	switch err.(type) {
+	case nil:
 		return codes.OK
-	case errors.As(err, &semerr.StatusRequestTimeoutError{}):
+	case semerr.StatusRequestTimeoutError:
 		return 1
-	case errors.As(err, &semerr.InternalServerError{}):
+	case semerr.InternalServerError:
 		return 2
-	case errors.As(err, &semerr.BadRequestError{}):
+	case semerr.BadRequestError:
 		return 3
-	case errors.As(err, &semerr.UnsupportedMediaTypeError{}):
+	case semerr.UnsupportedMediaTypeError:
 		return 3
-	case errors.As(err, &semerr.StatusGatewayTimeoutError{}):
+	case semerr.StatusGatewayTimeoutError:
 		return 4
-	case errors.As(err, &semerr.NotFoundError{}):
+	case semerr.NotFoundError:
 		return 5
-	case errors.As(err, &semerr.ConflictError{}):
+	case semerr.ConflictError:
 		return 6
-	case errors.As(err, &semerr.ForbiddenError{}):
+	case semerr.ForbiddenError:
 		return 7
-	case errors.As(err, &semerr.TooManyRequestsError{}):
+	case semerr.TooManyRequestsError:
 		return 8
-	case errors.As(err, &semerr.RequestEntityTooLargeError{}):
+	case semerr.RequestEntityTooLargeError:
 		return 11
-	case errors.As(err, &semerr.UnimplementedError{}):
+	case semerr.UnimplementedError:
 		return 12
-	case errors.As(err, &semerr.ServiceUnavailableError{}):
+	case semerr.ServiceUnavailableError:
 		return 14
-	case errors.As(err, &semerr.UnauthorizedError{}):
+	case semerr.UnauthorizedError:
 		return 16
-	default:
-		return getGRPCErrorCode(err)
 	}
+
+	grpcCode := getGRPCErrorCode(err)
+	if grpcCode != codes.Unknown {
+		return grpcCode
+	}
+
+	if err := errors.Unwrap(err); err != nil {
+		return codeRecursion(err)
+	}
+
+	if multiErr, ok := err.(multierr.MultiError); ok && multiErr != nil {
+		for _, err := range multiErr.Unwrap() {
+			code := codeRecursion(err)
+
+			if code != codes.Unknown {
+				return code
+			}
+		}
+	}
+
+	return codes.Unknown
 }
 
 func getGRPCErrorCode(err error) codes.Code {
