@@ -3,7 +3,7 @@ module github.com/hedhyw/semerr
 go 1.17
 
 require (
-	google.golang.org/grpc v1.53.0
+	google.golang.org/grpc v1.54.0
 	gopkg.in/yaml.v2 v2.4.0
 )
 
