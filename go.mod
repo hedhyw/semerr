@@ -2,6 +2,8 @@ module github.com/hedhyw/semerr
 
 go 1.23.0
 
+toolchain go1.24.4
+
 require (
 	google.golang.org/grpc v1.74.2
 	gopkg.in/yaml.v2 v2.4.0
