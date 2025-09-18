@@ -30,6 +30,8 @@ func codeRecursion(err error) codes.Code {
 		return 3
 	case semerr.UnsupportedMediaTypeError:
 		return 3
+	case semerr.UnprocessableEntityError:
+		return 3
 	case semerr.StatusGatewayTimeoutError:
 		return 4
 	case semerr.NotFoundError:

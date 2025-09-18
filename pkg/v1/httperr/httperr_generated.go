@@ -33,6 +33,8 @@ func codeRecursion(err error) int {
 		return 400
 	case semerr.UnsupportedMediaTypeError:
 		return 415
+	case semerr.UnprocessableEntityError:
+		return 422
 	case semerr.StatusGatewayTimeoutError:
 		return 504
 	case semerr.NotFoundError:
