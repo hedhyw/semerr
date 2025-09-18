@@ -52,6 +52,10 @@ func TestCode(t *testing.T) {
 			Code: 3,
 		},
 		{
+			Err:  semerr.NewUnprocessableEntityError(err),
+			Code: 3,
+		},
+		{
 			Err:  semerr.NewStatusGatewayTimeoutError(err),
 			Code: 4,
 		},

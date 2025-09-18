@@ -128,11 +128,18 @@ err = semerr.NewInternalServerError(err)
 // HTTP: Bad Request (400); GRPC: InvalidArgument (3).
 err = semerr.NewBadRequestError(err)
 
-// It indicates indicates that the origin server is refusing
+// It indicates that the origin server is refusing
 // to service the request because the content is in a format
 // not supported by this method on the target resource.
 // HTTP: Unsupported Media Type (415); GRPC: InvalidArgument (3).
 err = semerr.NewUnsupportedMediaTypeError(err)
+
+// It indicates that the server understood the content type
+// of the request content, and the syntax of the request
+// content was correct, but it was unable to process the
+// contained instructions.
+// HTTP: Unprocessable Entity (422); GRPC: InvalidArgument (3).
+err = semerr.NewUnprocessableEntityError(err)
 
 // It indicates that the server, while acting as a gateway or
 // proxy, did not receive a timely response from an upstream

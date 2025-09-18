@@ -101,10 +101,20 @@ errors:
         reverse: true
     "UnsupportedMediaTypeError":
         description: |
-            It indicates indicates that the origin server is refusing
+            It indicates that the origin server is refusing
             to service the request because the content is in a format
             not supported by this method on the target resource.
         grpc: 3
         http: 415
+        temporary: false
+        reverse: false
+    "UnprocessableEntityError":
+        description: |
+            It indicates that the server understood the content type
+            of the request content, and the syntax of the request
+            content was correct, but it was unable to process the
+            contained instructions.
+        grpc: 3
+        http: 422
         temporary: false
         reverse: false

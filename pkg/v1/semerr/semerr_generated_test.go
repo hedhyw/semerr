@@ -41,6 +41,11 @@ func TestWrappedErrors(t *testing.T) {
 			Temporary: false,
 		},
 		{
+			Name:      "UnprocessableEntityError",
+			Create:    semerr.NewUnprocessableEntityError,
+			Temporary: false,
+		},
+		{
 			Name:      "StatusGatewayTimeoutError",
 			Create:    semerr.NewStatusGatewayTimeoutError,
 			Temporary: true,
