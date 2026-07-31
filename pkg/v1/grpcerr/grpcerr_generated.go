@@ -42,6 +42,8 @@ func codeRecursion(err error) codes.Code {
 		return 7
 	case semerr.TooManyRequestsError:
 		return 8
+	case semerr.PaymentRequiredError:
+		return 9
 	case semerr.RequestEntityTooLargeError:
 		return 11
 	case semerr.UnimplementedError:
@@ -117,6 +119,8 @@ func Wrap(err error, code codes.Code) error {
 		return semerr.NewForbiddenError(err)
 	case 8:
 		return semerr.NewTooManyRequestsError(err)
+	case 9:
+		return semerr.NewPaymentRequiredError(err)
 	case 11:
 		return semerr.NewRequestEntityTooLargeError(err)
 	case 12:

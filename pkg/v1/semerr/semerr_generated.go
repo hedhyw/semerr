@@ -312,6 +312,38 @@ func NewTooManyRequestsError(err error) error {
 	return TooManyRequestsError{newPermanentWrappedError(err)}
 }
 
+// PaymentRequiredError is not a temporary error.
+//
+// It indicates that the request cannot be completed because
+// payment is required or the account has insufficient balance
+// to perform the requested operation.
+//
+// It represents following statuses:
+// - HTTP code: Payment Required (402).
+// - GRPC code: FailedPrecondition (9).
+type PaymentRequiredError struct {
+	permanentWrappedError
+}
+
+// NewPaymentRequiredError wraps err and creates PaymentRequiredError.
+//
+// It indicates that the request cannot be completed because
+// payment is required or the account has insufficient balance
+// to perform the requested operation.
+//
+// It represents following statuses:
+// - HTTP code: Payment Required (402).
+// - GRPC code: FailedPrecondition (9).
+//
+// If err is nil it returns nil.
+func NewPaymentRequiredError(err error) error {
+	if err == nil {
+		return nil
+	}
+
+	return PaymentRequiredError{newPermanentWrappedError(err)}
+}
+
 // RequestEntityTooLargeError is not a temporary error.
 //
 // It indicates that the server is refusing to process

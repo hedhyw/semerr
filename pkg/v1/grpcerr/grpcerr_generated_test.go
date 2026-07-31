@@ -76,6 +76,10 @@ func TestCode(t *testing.T) {
 			Code: 8,
 		},
 		{
+			Err:  semerr.NewPaymentRequiredError(err),
+			Code: 9,
+		},
+		{
 			Err:  semerr.NewRequestEntityTooLargeError(err),
 			Code: 11,
 		},
@@ -179,6 +183,12 @@ func TestWrap(t *testing.T) {
 				return errors.As(err, &semerr.TooManyRequestsError{})
 			},
 			Code: 8,
+		},
+		{
+			Check: func(err error) bool {
+				return errors.As(err, &semerr.PaymentRequiredError{})
+			},
+			Code: 9,
 		},
 		{
 			Check: func(err error) bool {

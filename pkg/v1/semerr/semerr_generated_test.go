@@ -71,6 +71,11 @@ func TestWrappedErrors(t *testing.T) {
 			Temporary: false,
 		},
 		{
+			Name:      "PaymentRequiredError",
+			Create:    semerr.NewPaymentRequiredError,
+			Temporary: false,
+		},
+		{
 			Name:      "RequestEntityTooLargeError",
 			Create:    semerr.NewRequestEntityTooLargeError,
 			Temporary: false,
