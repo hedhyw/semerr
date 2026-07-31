@@ -23,6 +23,15 @@ errors:
         http: 400
         temporary: false
         reverse: true
+    "PaymentRequiredError":
+        description: |
+            It indicates that the request cannot be completed because
+            payment is required or the account has insufficient balance
+            to perform the requested operation.
+        grpc: 9
+        http: 402
+        temporary: false
+        reverse: true
     "StatusGatewayTimeoutError":
         description: |
             It indicates that the server, while acting as a gateway or
