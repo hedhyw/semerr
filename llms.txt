@@ -1,0 +1,25 @@
+# semerr
+
+> Go library for semantic, transport-independent errors. Wrap any error with
+> a meaning (`semerr.NewNotFoundError(err)`, `semerr.NewBadRequestError(err)`, …)
+> in domain code, then extract the matching HTTP status code (`httperr.Code(err)`)
+> or gRPC code (`grpcerr.Code(err)`) at the transport layer. Wrapping preserves
+> the original error chain: `errors.Is`, `errors.As`, and `errors.Join` keep
+> working. Wrapping `nil` returns `nil`.
+
+Module: `github.com/hedhyw/semerr` (Go). Public API lives under `pkg/v1/`.
+
+Import paths:
+- `github.com/hedhyw/semerr/pkg/v1/semerr` — error types, `New<Name>Error(err)` constructors, const-able `semerr.Error` string type
+- `github.com/hedhyw/semerr/pkg/v1/httperr` — `Code(err) int`, `Wrap(err, statusCode)`
+- `github.com/hedhyw/semerr/pkg/v1/grpcerr` — `Code(err) codes.Code`, `Wrap(err, code)`
+
+Most code is generated from `internal/cmd/generator/errors.yaml`; do not edit
+`*_generated*.go` or `README.md` directly (see AGENTS.md).
+
+## Docs
+
+- [README](https://github.com/hedhyw/semerr/blob/main/README.md): purpose, quick start, layered-service usage pattern, full error reference with HTTP/gRPC mappings
+- [AGENTS.md](https://github.com/hedhyw/semerr/blob/main/AGENTS.md): guide for coding agents — API summary, code-generation rules, commands, conventions
+- [API reference](https://pkg.go.dev/github.com/hedhyw/semerr/pkg/v1/semerr): godoc for the core package
+- [errors.yaml](https://github.com/hedhyw/semerr/blob/main/internal/cmd/generator/errors.yaml): source of truth for all error definitions and their HTTP/gRPC codes

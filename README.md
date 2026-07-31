@@ -8,20 +8,68 @@
 [![Coverage Status](https://coveralls.io/repos/github/hedhyw/semerr/badge.svg?branch=main)](https://coveralls.io/github/hedhyw/semerr?branch=main)
 [![PkgGoDev](https://pkg.go.dev/badge/github.com/hedhyw/semerr)](https://pkg.go.dev/github.com/hedhyw/semerr?tab=doc)
 
-Package `semerr` helps to work with errors in Golang. It supports go 1.20 [errors.Join](https://pkg.go.dev/errors#Join).
+**Semantic errors for Go: give errors a meaning, not a transport.**
 
-<img alr="Go Bug" src="https://raw.githubusercontent.com/ashleymcnamara/gophers/master/GO_BUG.png" width="100px">
+`semerr` lets you mark any error with a semantic meaning — *not found*,
+*unauthorized*, *conflict*, … — without coupling your business logic to HTTP
+or gRPC. The transport layer later extracts the right status code from the
+error chain. Wrapping is transparent: `errors.Is`, `errors.As`, and go 1.20
+[errors.Join](https://pkg.go.dev/errors#Join) keep working on the original
+error.
 
-## Status errors
+<img alt="Go Bug" src="https://raw.githubusercontent.com/ashleymcnamara/gophers/master/GO_BUG.png" width="100px">
 
-Those errors are based on HTTP status names, but they are designed to be
-transport-independent. For example `semerr.NewNotFoundError(err)` indicates
-that something is not found
-(and it is possible to extract HTTP status -> `404` and gRPC status -> `5` if required).
+## Why?
 
-Small example:
+A typical layered service has a problem: the repository knows about
+`sql.ErrNoRows` or `redis.Nil`, the HTTP handler knows about `404`, and the
+domain logic in between should know about neither. Passing driver errors up
+leaks implementation details; returning HTTP codes from the domain couples it
+to one transport.
+
+`semerr` solves this with a small set of transport-independent error types
+named after HTTP status names:
+
+- The **repository** wraps driver errors: `semerr.NewNotFoundError(err)`.
+- The **domain** checks meaning: `errors.As(err, &semerr.NotFoundError{})`.
+- The **transport** extracts a code: `httperr.Code(err)` → `404`,
+  `grpcerr.Code(err)` → `codes.NotFound`.
+
+The original error is wrapped without modification, so its message and chain
+are fully preserved.
+
+## Installation
+
+```sh
+go get github.com/hedhyw/semerr
+```
+
 ```go
-// Repository layer.
+import (
+    "github.com/hedhyw/semerr/pkg/v1/semerr"  // Error types and constructors.
+    "github.com/hedhyw/semerr/pkg/v1/httperr" // HTTP status mapping.
+    "github.com/hedhyw/semerr/pkg/v1/grpcerr" // gRPC code mapping.
+)
+```
+
+## Quick start
+
+```go
+err := doSomething()
+if errors.Is(err, storage.ErrNotExist) {
+    err = semerr.NewNotFoundError(err)
+}
+
+// Anywhere up the call stack:
+httperr.Code(err) // 404
+grpcerr.Code(err) // codes.NotFound
+errors.Is(err, storage.ErrNotExist) // still true
+```
+
+## Typical pattern: layered service
+
+```go
+// Repository layer: translate driver errors into semantic ones.
 
 type RedisUserRepo struct {}
 
@@ -38,31 +86,31 @@ func (r RedisUserRepo) Get(ctx context.Context, id string) (entity.User, error) 
     }
 }
 
-// Domain layer.
+// Domain layer: react to meaning, not to implementation.
 
-func (c *Core) CreateOrder(ctx context.Context, order entity.Order) (err error)
+func (c *Core) CreateOrder(ctx context.Context, order entity.Order) (err error) {
     user, err := c.userRepo.GetCurrentUser(ctx)
     switch {
     case err == nil:
         // OK. Go on.
     case errors.As(err, &semerr.NotFoundError{}):
-        // Repository can have any implementation and we should NOT know about
-        // `sql.ErrNoRows`, `redis.Nil`, `mongo.NoKey`, so we just compare the `err` to
-        // `semerr.NotFoundError`.
+        // The repository can have any implementation, and we should NOT know
+        // about `sql.ErrNoRows`, `redis.Nil`, `mongo.NoKey` here — we just
+        // compare the `err` to `semerr.NotFoundError`.
         //
         // We still can check `errors.Is(err, redis.Nil)` if we want,
         // because the `err` is just wrapped without any modifications!
         //
-        // Also we can change meaning by rewrapping the `err`. Check the next line:
+        // Also we can change the meaning by rewrapping the `err`:
         return fmt.Errorf("getting user: %w", semerr.NewUnauthorizedError(err))
     default:
-        return fmt.Errorf("getting user: %w" ,err)
+        return fmt.Errorf("getting user: %w", err)
     }
-    
+
     // ...
 }
 
-// Transport layer.
+// Transport layer: extract the status code.
 
 func (s *Server) handleCreateOrder(w http.ResponseWriter, r *http.Request) {
     ctx := r.Context()
@@ -71,7 +119,7 @@ func (s *Server) handleCreateOrder(w http.ResponseWriter, r *http.Request) {
 
     err := s.core.CreateOrder(ctx, order)
     if err != nil {
-        // Respond with the correct status.
+        // Respond with the correct status: 401 here, 500 for unknown errors.
         w.WriteHeader(httperr.Code(err))
 
         // It is better to organize a helper for `err` responding.
@@ -87,29 +135,35 @@ func (s *Server) handleCreateOrder(w http.ResponseWriter, r *http.Request) {
 
 ```go
 errOriginal := errors.New("some error")
-errWrapped := semerr.NewBadRequestError(errOriginal) // The text will be the same.
-errJoined := errors.Join(errOriginal, errWrapped) // It supports joined errors.
+errWrapped := semerr.NewBadRequestError(errOriginal) // The text stays the same.
+errJoined := errors.Join(errOriginal, errWrapped) // Joined errors are supported.
 
 fmt.Println(errWrapped) // "some error"
 fmt.Println(httperr.Code(errWrapped)) // http.StatusBadRequest
 fmt.Println(httperr.Code(errJoined)) // http.StatusBadRequest
+fmt.Println(httperr.Code(errOriginal)) // http.StatusInternalServerError (unknown error).
+fmt.Println(httperr.Code(nil)) // http.StatusOK
 fmt.Println(grpcerr.Code(errWrapped)) // codes.InvalidArgument
 fmt.Println(grpcerr.Code(errJoined)) // codes.InvalidArgument
-fmt.Println(errors.Is(err, errOriginal)) // true
-fmt.Println(semerr.NewBadRequestError(nil)) // nil
+fmt.Println(errors.Is(errWrapped, errOriginal)) // true
+fmt.Println(semerr.NewBadRequestError(nil)) // nil: wrapping nil gives nil.
 fmt.Println(httperr.Wrap(errOriginal, http.StatusBadRequest)) // = semerr.NewBadRequestError(errOriginal)
+fmt.Println(grpcerr.Wrap(errOriginal, codes.InvalidArgument)) // = semerr.NewBadRequestError(errOriginal)
 ```
 
 ## Const error
 
-An error that can be defined as `const`.
+An error that can be defined as `const`:
 
 ```go
 var errMutable error = errors.New("mutable error") // Do not like this?
 const errImmutable semerr.Error = "immutable error" // So use this.
 ```
 
-## Also see
+## Error reference
+
+All errors, with their HTTP and gRPC mappings:
+
 ```go
 err := errors.New("some error")
 
