@@ -65,7 +65,6 @@ semerr.go                       # go:generate entry point only
 pkg/v1/{semerr,httperr,grpcerr} # public API (v1)
 internal/cmd/generator/         # code generator + errors.yaml
 internal/pkg/multierr/          # helper for joined (multi) errors
-vendor/                         # vendored dependencies (kept in git)
 ```
 
 ## Commands
@@ -77,8 +76,7 @@ make test       # tests with coverage across pkg/...
 make            # generate + lint + test
 ```
 
-Go version: see `go.mod`. Dependencies are vendored; after changing
-dependencies run `go mod tidy && go mod vendor` and commit `vendor/`.
+Go version: see `go.mod`. After changing dependencies run `go mod tidy`.
 
 ## Conventions
 
