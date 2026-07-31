@@ -168,6 +168,12 @@ err = semerr.NewForbiddenError(err)
 // HTTP: Too Many Requests (429); GRPC: ResourceExhausted (8).
 err = semerr.NewTooManyRequestsError(err)
 
+// It indicates that the request cannot be completed because
+// payment is required or the account has insufficient balance
+// to perform the requested operation.
+// HTTP: Payment Required (402); GRPC: FailedPrecondition (9).
+err = semerr.NewPaymentRequiredError(err)
+
 // It indicates that the server is refusing to process
 // a request because the request content is larger than
 // the server 

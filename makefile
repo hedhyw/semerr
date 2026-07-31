@@ -1,5 +1,5 @@
 FILES_DIR?=$(PWD)/pkg/v1
-GOLANGCI_LINT_VER:=v2.3.1
+GOLANGCI_LINT_VER:=v2.12.2
 
 all: generate lint test
 .PHONY: all
@@ -22,7 +22,4 @@ lint: bin/golangci-lint
 .PHONY: lint
 
 bin/golangci-lint:
-	curl \
-		-sSfL \
-		https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh \
-		| sh -s $(GOLANG_CI_LINT_VER)
+	curl -sSfL https://golangci-lint.run/install.sh | sh -s -- -b ./bin $(GOLANG_CI_LINT_VER)
