@@ -1,17 +1,17 @@
 module github.com/hedhyw/semerr
 
-go 1.25.0
+go 1.26.0
 
 require (
-	google.golang.org/grpc v1.83.0
+	google.golang.org/grpc v1.85.0
 	gopkg.in/yaml.v2 v2.4.0
 )
 
 require (
 	github.com/kr/pretty v0.3.0 // indirect
 	github.com/rogpeppe/go-internal v1.9.0 // indirect
-	golang.org/x/sys v0.47.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260729162451-8efbd57d26e0 // indirect
-	google.golang.org/protobuf v1.36.11 // indirect
+	golang.org/x/sys v0.48.0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260817212433-ac3dfec99bb1 // indirect
+	google.golang.org/protobuf v1.36.12 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 )
